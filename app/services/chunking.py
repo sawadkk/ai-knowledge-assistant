@@ -15,10 +15,9 @@ def combine_sents(
     max_chars: int = 1000,
 ) -> List[str]:
     """
-       Build chunks by combining sentences up to ~target_chars.
-       Ensures chunks are not too tiny; caps at max_chars.
+    Build chunks by combining sentences up to ~target_chars.
+    Ensures chunks are not too tiny; caps at max_chars.
     """
-
     chunks: List[str] = []
     buf: List[str] = []
     size = 0
@@ -29,12 +28,24 @@ def combine_sents(
             buf.append(s)
             size += s_len + 1
             continue
+        # flush current buffer if large enough
         if buf:
             chunk = " ".join(buf).strip()
             if len(chunk) >= min_chars or not chunks:
                 chunks.append(chunk)
             else:
-                chunks[-1] = (chunk[-1] + " " + chunk).strip()
+                # append to previous if this one is too small
+                chunks[-1] = (chunks[-1] + " " + chunk).strip()
+        buf = [s]
+        size = s_len + 1
+
+    if buf:
+        chunk = " ".join(buf).strip()
+        if len(chunk) >= min_chars or not chunks:
+            chunks.append(chunk)
+        else:
+            chunks[-1] = (chunks[-1] + " " + chunk).strip()
+
     return chunks
 
 def smart_chunks(
