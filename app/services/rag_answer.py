@@ -15,12 +15,15 @@ SYSTEM_HINT = (
     "If the answer is not in the context, say you don't know"
 )
 
-def build_context(chunks) -> str:
-    lines: List[str]  = []
-    for i, h in enumerate(chunks, start=1):
+def build_context(hits) -> str:
+    """
+    Builds context string; if chunk_idx/doc_id present, show index and title.
+    """
+    lines = []
+    for i, h in enumerate(hits, 1):
         txt = h.payload.get("text", "")
-        meta = {k: v for k, v  in h.payload.items() if k != "text"}
-        lines.append(f"{i} {txt}\nMETA: {meta}")
+        meta = {k: v for k, v in h.payload.items() if k != "text"}
+        lines.append(f"[{i}] {txt}\nMETA: {meta}")
     return "\n\n".join(lines)
 
 def answer_with_rag(question: str, top_k: int = 5) -> dict:
